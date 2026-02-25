@@ -1,11 +1,17 @@
 "use client";
 
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, useRef } from "react";
 import { recipes } from "@/data/recipes";
 import { MealSelection, ViewState, ConsolidatedItem } from "@/lib/types";
 import { suggestMeals, rankSwapCandidates } from "@/lib/suggest";
-import { consolidateIngredients } from "@/lib/consolidate";
+import { consolidateWithPantry, ConsolidationResult } from "@/lib/consolidate";
 import { Recipe } from "@/lib/types";
+import { usePantryConfig } from "./use-pantry-config";
+
+interface PlanSnapshot {
+  selectedRecipes: Recipe[];
+  selections: MealSelection[];
+}
 
 export function useMealPlan() {
   const [view, setView] = useState<ViewState>("plan");
@@ -15,6 +21,12 @@ export function useMealPlan() {
   const [selectedRecipes, setSelectedRecipes] = useState<Recipe[]>([]);
   const [checkedItems, setCheckedItems] = useState<Set<string>>(new Set());
   const [hasGenerated, setHasGenerated] = useState(false);
+
+  // Undo support for waste swap
+  const undoSnapshot = useRef<PlanSnapshot | null>(null);
+  const [canUndo, setCanUndo] = useState(false);
+
+  const { pantryItems, addItem: addPantryItem, removeItem: removePantryItem, isOnHand } = usePantryConfig();
 
   const generatePlan = useCallback(() => {
     const suggested = suggestMeals(recipes, mealCount);
@@ -26,6 +38,8 @@ export function useMealPlan() {
       }))
     );
     setHasGenerated(true);
+    undoSnapshot.current = null;
+    setCanUndo(false);
   }, [mealCount, peopleCount]);
 
   const shuffle = useCallback(() => {
@@ -37,6 +51,8 @@ export function useMealPlan() {
         servings: peopleCount,
       }))
     );
+    undoSnapshot.current = null;
+    setCanUndo(false);
   }, [mealCount, peopleCount]);
 
   const swapRecipe = useCallback(
@@ -54,6 +70,63 @@ export function useMealPlan() {
     },
     [peopleCount]
   );
+
+  const acceptWasteSwap = useCallback(
+    (suggestedRecipeId: string) => {
+      // Save snapshot for undo
+      undoSnapshot.current = {
+        selectedRecipes: [...selectedRecipes],
+        selections: [...selections],
+      };
+      setCanUndo(true);
+
+      const suggestedRecipe = recipes.find((r) => r.id === suggestedRecipeId);
+      if (!suggestedRecipe) return;
+
+      // Find the recipe with lowest overlap to the rest (the "least relevant")
+      const overlapScores = selectedRecipes.map((recipe) => {
+        const others = selectedRecipes.filter((r) => r.id !== recipe.id);
+        // Use rankSwapCandidates logic in reverse: score each current recipe
+        // by how much overlap it has with the others
+        let totalOverlap = 0;
+        for (const other of others) {
+          const sharedKeys = new Set<string>();
+          const rKeys = new Set(recipe.ingredients.map((i) => i.name.toLowerCase().trim()));
+          for (const ing of other.ingredients) {
+            if (rKeys.has(ing.name.toLowerCase().trim())) {
+              sharedKeys.add(ing.name.toLowerCase().trim());
+            }
+          }
+          totalOverlap += sharedKeys.size;
+        }
+        return { recipe, score: totalOverlap };
+      });
+
+      overlapScores.sort((a, b) => a.score - b.score);
+      const leastRelevant = overlapScores[0]?.recipe;
+      if (!leastRelevant) return;
+
+      setSelectedRecipes((prev) =>
+        prev.map((r) => (r.id === leastRelevant.id ? suggestedRecipe : r))
+      );
+      setSelections((prev) =>
+        prev.map((s) =>
+          s.recipeId === leastRelevant.id
+            ? { recipeId: suggestedRecipe.id, servings: peopleCount }
+            : s
+        )
+      );
+    },
+    [selectedRecipes, selections, peopleCount]
+  );
+
+  const undoWasteSwap = useCallback(() => {
+    if (!undoSnapshot.current) return;
+    setSelectedRecipes(undoSnapshot.current.selectedRecipes);
+    setSelections(undoSnapshot.current.selections);
+    undoSnapshot.current = null;
+    setCanUndo(false);
+  }, []);
 
   const getSwapCandidates = useCallback(
     (recipeId: string) => {
@@ -76,13 +149,22 @@ export function useMealPlan() {
     []
   );
 
-  const groceryList: ConsolidatedItem[] = useMemo(() => {
-    if (selections.length === 0) return [];
+  const groceryData: ConsolidationResult = useMemo(() => {
+    if (selections.length === 0) return { items: [], pantryItems: [] };
     const selectedRecipeObjects = selections
       .map((s) => recipes.find((r) => r.id === s.recipeId))
       .filter((r): r is Recipe => r !== undefined);
-    return consolidateIngredients(selectedRecipeObjects, selections);
-  }, [selections]);
+    return consolidateWithPantry(selectedRecipeObjects, selections, pantryItems);
+  }, [selections, pantryItems]);
+
+  const groceryList = groceryData.items;
+  const pantryReminders = groceryData.pantryItems;
+
+  const [promotedPantryItems, setPromotedPantryItems] = useState<Set<string>>(new Set());
+
+  const promotePantryItem = useCallback((normalizedName: string) => {
+    setPromotedPantryItems((prev) => new Set([...prev, normalizedName]));
+  }, []);
 
   const toggleChecked = useCallback((normalizedName: string) => {
     setCheckedItems((prev) => {
@@ -98,6 +180,7 @@ export function useMealPlan() {
 
   const goToList = useCallback(() => {
     setCheckedItems(new Set());
+    setPromotedPantryItems(new Set());
     setView("list");
   }, []);
 
@@ -117,12 +200,22 @@ export function useMealPlan() {
     generatePlan,
     shuffle,
     swapRecipe,
+    acceptWasteSwap,
+    undoWasteSwap,
+    canUndo,
     getSwapCandidates,
     updateServings,
     groceryList,
+    pantryReminders,
+    promotedPantryItems,
+    promotePantryItem,
     checkedItems,
     toggleChecked,
     goToList,
     goToPlan,
+    pantryItems,
+    addPantryItem,
+    removePantryItem,
+    isOnHand,
   };
 }

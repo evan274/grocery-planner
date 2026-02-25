@@ -1,4 +1,5 @@
 import { Recipe, MealSelection, ConsolidatedItem, StoreCategory } from "./types";
+import { applyRounding } from "./rounding";
 
 const synonymMap: Record<string, string> = {
   "extra-virgin olive oil": "olive oil",
@@ -200,10 +201,25 @@ function isToTaste(amount: string): boolean {
   return lower === "to taste" || lower === "as needed";
 }
 
+export interface ConsolidationResult {
+  items: ConsolidatedItem[];
+  pantryItems: ConsolidatedItem[];
+}
+
 export function consolidateIngredients(
   recipes: Recipe[],
-  selections: MealSelection[]
+  selections: MealSelection[],
+  pantrySet?: Set<string>
 ): ConsolidatedItem[] {
+  const result = consolidateWithPantry(recipes, selections, pantrySet);
+  return result.items;
+}
+
+export function consolidateWithPantry(
+  recipes: Recipe[],
+  selections: MealSelection[],
+  pantrySet?: Set<string>
+): ConsolidationResult {
   const selectionMap = new Map(selections.map((s) => [s.recipeId, s]));
   const groups = new Map<
     string,
@@ -223,7 +239,7 @@ export function consolidateIngredients(
     const selection = selectionMap.get(recipe.id);
     if (!selection) continue;
 
-    const scale = selection.servings / recipe.baseServings;
+    const scale = selection.servings / 4;
 
     for (const ing of recipe.ingredients) {
       const normalized = normalizeIngredientName(ing.name);
@@ -265,11 +281,11 @@ export function consolidateIngredients(
     }
   }
 
-  const items: ConsolidatedItem[] = [];
+  const allItems: ConsolidatedItem[] = [];
 
   for (const [normalized, group] of groups) {
     if (group.isToTaste && group.totalTsp === null && group.rawAmounts.length === 0) {
-      items.push({
+      allItems.push({
         normalizedName: normalized,
         displayName: group.displayName,
         totalAmount: null,
@@ -283,7 +299,7 @@ export function consolidateIngredients(
 
     if (group.hasVolume && group.totalTsp !== null) {
       const converted = fromTsp(group.totalTsp);
-      items.push({
+      allItems.push({
         normalizedName: normalized,
         displayName: group.displayName,
         totalAmount: converted.amount,
@@ -305,7 +321,7 @@ export function consolidateIngredients(
       // If we already added a volume entry, skip if this is also volume
       if (group.hasVolume && isVolumeUnit(unit)) continue;
 
-      items.push({
+      allItems.push({
         normalizedName: normalized,
         displayName: group.displayName,
         totalAmount: Math.round(total * 100) / 100,
@@ -315,9 +331,10 @@ export function consolidateIngredients(
         sources: Array.from(group.sources),
       });
     }
-
-    // If only to-taste entries existed alongside measured ones, we already handled it
   }
+
+  // Apply rounding for purchasable quantities
+  const rounded = applyRounding(allItems);
 
   // Sort by category then alphabetically
   const categoryOrder: StoreCategory[] = [
@@ -334,13 +351,29 @@ export function consolidateIngredients(
     "Other",
   ];
 
-  items.sort((a, b) => {
+  rounded.sort((a, b) => {
     const catDiff = categoryOrder.indexOf(a.category) - categoryOrder.indexOf(b.category);
     if (catDiff !== 0) return catDiff;
     return a.displayName.localeCompare(b.displayName);
   });
 
-  return items;
+  // Split into regular items and pantry items
+  if (pantrySet && pantrySet.size > 0) {
+    const regular: ConsolidatedItem[] = [];
+    const pantry: ConsolidatedItem[] = [];
+
+    for (const item of rounded) {
+      if (pantrySet.has(item.normalizedName)) {
+        pantry.push({ ...item, isPantry: true });
+      } else {
+        regular.push(item);
+      }
+    }
+
+    return { items: regular, pantryItems: pantry };
+  }
+
+  return { items: rounded, pantryItems: [] };
 }
 
 function capitalize(s: string): string {

@@ -4,6 +4,8 @@ import { Recipe, MealSelection, WasteWarning } from "@/lib/types";
 import { recipes as allRecipes } from "@/data/recipes";
 import { useMemo } from "react";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Plus, Undo2 } from "lucide-react";
 
 // Perishable ingredients that trigger waste warnings
 const perishables = new Set([
@@ -39,11 +41,17 @@ function normalizeKey(name: string): string {
 interface IngredientWarningsProps {
   selectedRecipes: Recipe[];
   selections: MealSelection[];
+  onAcceptWasteSwap?: (suggestedRecipeId: string) => void;
+  onUndo?: () => void;
+  canUndo?: boolean;
 }
 
 export function IngredientWarnings({
   selectedRecipes,
   selections,
+  onAcceptWasteSwap,
+  onUndo,
+  canUndo = false,
 }: IngredientWarningsProps) {
   const warnings = useMemo(() => {
     const selectedIds = new Set(selectedRecipes.map((r) => r.id));
@@ -55,7 +63,7 @@ export function IngredientWarnings({
     for (const recipe of selectedRecipes) {
       const sel = selectionMap.get(recipe.id);
       if (!sel) continue;
-      const scale = sel.servings / recipe.baseServings;
+      const scale = sel.servings / 4;
 
       for (const ing of recipe.ingredients) {
         const key = normalizeKey(ing.name);
@@ -102,13 +110,21 @@ export function IngredientWarnings({
     return result;
   }, [selectedRecipes, selections]);
 
-  if (warnings.length === 0) return null;
+  if (warnings.length === 0 && !canUndo) return null;
 
   return (
     <div className="space-y-2">
-      <h3 className="text-sm font-medium text-muted-foreground">
-        Waste warnings
-      </h3>
+      <div className="flex items-center justify-between">
+        <h3 className="text-sm font-medium text-muted-foreground">
+          Waste warnings
+        </h3>
+        {canUndo && onUndo && (
+          <Button variant="ghost" size="sm" onClick={onUndo} className="h-7 text-xs">
+            <Undo2 className="h-3 w-3 mr-1" />
+            Undo swap
+          </Button>
+        )}
+      </div>
       {warnings.map((w) => (
         <div
           key={w.ingredient}
@@ -117,9 +133,20 @@ export function IngredientWarnings({
           <Badge variant="outline" className="shrink-0 border-amber-300 text-amber-700 dark:border-amber-700 dark:text-amber-300">
             {w.ingredient}
           </Badge>
-          <span className="text-amber-800 dark:text-amber-200">
+          <span className="flex-1 text-amber-800 dark:text-amber-200">
             You&apos;ll use {w.currentAmount} &mdash; {w.suggestion}
           </span>
+          {onAcceptWasteSwap && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="shrink-0 h-7 text-xs border-amber-300 text-amber-700 hover:bg-amber-100 dark:border-amber-700 dark:text-amber-300 dark:hover:bg-amber-900"
+              onClick={() => onAcceptWasteSwap(w.suggestedRecipeId)}
+            >
+              <Plus className="h-3 w-3 mr-1" />
+              Add
+            </Button>
+          )}
         </div>
       ))}
     </div>

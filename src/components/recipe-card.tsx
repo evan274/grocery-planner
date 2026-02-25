@@ -22,6 +22,11 @@ export function RecipeCard({
   onSwap,
   sharedIngredients = [],
 }: RecipeCardProps) {
+  const servingLabel =
+    selection.servings === 4
+      ? "4 servings (feeds 2 + leftovers)"
+      : `${selection.servings} servings`;
+
   return (
     <Card>
       <CardContent className="p-4 space-y-3">
@@ -54,7 +59,7 @@ export function RecipeCard({
 
         <div className="flex items-center justify-between">
           <span className="text-xs text-muted-foreground">
-            Servings (base: {recipe.baseServings})
+            {servingLabel}
           </span>
           <ServingControl
             servings={selection.servings}

@@ -13,6 +13,9 @@ export interface Recipe {
   mealType: "dinner" | "lunch";
   baseServings: number;
   ingredients: Ingredient[];
+  prepMinutes?: number;
+  cookMinutes?: number;
+  tags?: string[];
 }
 
 export interface MealSelection {
@@ -41,6 +44,7 @@ export interface ConsolidatedItem {
   category: StoreCategory;
   isToTaste: boolean;
   sources: string[]; // recipe names
+  isPantry?: boolean;
 }
 
 export interface WasteWarning {
@@ -51,3 +55,10 @@ export interface WasteWarning {
 }
 
 export type ViewState = "plan" | "list";
+
+export interface StapleItem {
+  id: string;
+  name: string;
+  category: StoreCategory;
+  checked: boolean;
+}

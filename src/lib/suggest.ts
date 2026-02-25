@@ -30,7 +30,7 @@ function normalizeKey(name: string): string {
 }
 
 // Pantry staples we don't count for overlap scoring
-const pantryStaples = new Set([
+export const pantryStaples = new Set([
   "salt",
   "black pepper",
   "olive oil",

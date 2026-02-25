@@ -6,6 +6,9 @@ export const recipes: Recipe[] = [
     name: "Crispy Gnocchi with Sausage and Broccoli",
     mealType: "dinner",
     baseServings: 4,
+    prepMinutes: 10,
+    cookMinutes: 25,
+    tags: ["easy"],
     ingredients: [
       { amount: "1", unit: "package", name: "Potato gnocchi", component: "Starch", notes: "12-18 oz shelf-stable", numericAmount: 1 },
       { amount: "1", unit: "large head", name: "Broccoli", component: "Vegetable", notes: "About 1 lb - florets cut 1.5-2 inch pieces", numericAmount: 1 },
@@ -23,6 +26,9 @@ export const recipes: Recipe[] = [
     name: "Sticky Ginger Sesame Tofu",
     mealType: "dinner",
     baseServings: 2,
+    prepMinutes: 15,
+    cookMinutes: 20,
+    tags: ["vegetarian"],
     ingredients: [
       { amount: "300", unit: "g", name: "Firm tofu", component: "Protein", notes: "Tear into nugget-sized pieces", numericAmount: 300 },
       { amount: "1", unit: "tbsp", name: "Cornflour", component: "Coating", notes: "For tofu coating", numericAmount: 1 },
@@ -50,6 +56,9 @@ export const recipes: Recipe[] = [
     name: "Ground Beef Lasagna",
     mealType: "dinner",
     baseServings: 4,
+    prepMinutes: 20,
+    cookMinutes: 45,
+    tags: [],
     ingredients: [
       { amount: "2", unit: "tbsp", name: "Olive oil", component: "Base", notes: "", numericAmount: 2 },
       { amount: "0.5", unit: "whole", name: "Yellow onion", component: "Aromatics", notes: "Diced", numericAmount: 0.5 },
@@ -73,6 +82,9 @@ export const recipes: Recipe[] = [
     name: "Cannellini Bean Chicken Sausage Stew",
     mealType: "dinner",
     baseServings: 4,
+    prepMinutes: 10,
+    cookMinutes: 20,
+    tags: ["fast", "easy"],
     ingredients: [
       { amount: "As needed", unit: "", name: "Oil", component: "Base", notes: "For the pan", numericAmount: null },
       { amount: "1", unit: "lb", name: "Spicy Italian chicken sausage", component: "Protein", notes: "Casings removed - can sub pork", numericAmount: 1 },
@@ -90,6 +102,9 @@ export const recipes: Recipe[] = [
     name: "Air Fryer Chicken Shawarma Gyro",
     mealType: "dinner",
     baseServings: 4,
+    prepMinutes: 20,
+    cookMinutes: 15,
+    tags: [],
     ingredients: [
       { amount: "1.5", unit: "lbs", name: "Boneless chicken breast", component: "Protein", notes: "About 3 breasts - sliced", numericAmount: 1.5 },
       { amount: "2", unit: "tbsp", name: "Olive oil", component: "Marinade", notes: "", numericAmount: 2 },
@@ -125,6 +140,9 @@ export const recipes: Recipe[] = [
     name: "One Pot Sausage Couscous Bowls",
     mealType: "dinner",
     baseServings: 4,
+    prepMinutes: 10,
+    cookMinutes: 20,
+    tags: ["fast", "easy"],
     ingredients: [
       { amount: "4", unit: "links", name: "Chicken sausage", component: "Protein", notes: "", numericAmount: 4 },
       { amount: "2", unit: "tbsp", name: "Olive oil", component: "Base", notes: "", numericAmount: 2 },
@@ -146,6 +164,9 @@ export const recipes: Recipe[] = [
     name: "Shrimp Scampi with Orzo",
     mealType: "dinner",
     baseServings: 4,
+    prepMinutes: 10,
+    cookMinutes: 20,
+    tags: ["fast"],
     ingredients: [
       { amount: "1", unit: "lb", name: "Large shrimp", component: "Protein", notes: "Peeled and deveined", numericAmount: 1 },
       { amount: "3", unit: "tbsp", name: "Extra-virgin olive oil", component: "Base", notes: "", numericAmount: 3 },
@@ -166,6 +187,9 @@ export const recipes: Recipe[] = [
     name: "Mini Meatball Soup with Sausage Orecchiette",
     mealType: "dinner",
     baseServings: 5,
+    prepMinutes: 15,
+    cookMinutes: 30,
+    tags: [],
     ingredients: [
       { amount: "To taste", unit: "", name: "Kosher salt", component: "Seasoning", notes: "", numericAmount: null },
       { amount: "To taste", unit: "", name: "Black pepper", component: "Seasoning", notes: "", numericAmount: null },
@@ -184,6 +208,9 @@ export const recipes: Recipe[] = [
     name: "Lemony Pasta with Zucchini and Fresh Herbs",
     mealType: "dinner",
     baseServings: 5,
+    prepMinutes: 10,
+    cookMinutes: 20,
+    tags: ["fast", "vegetarian"],
     ingredients: [
       { amount: "1", unit: "lb", name: "Fusilli pasta", component: "Starch", notes: "Or other short curvy pasta", numericAmount: 1 },
       { amount: "1.5", unit: "lbs", name: "Zucchini", component: "Vegetable", notes: "Or summer squash - halved lengthwise cut 0.5 inch thick", numericAmount: 1.5 },
@@ -203,6 +230,9 @@ export const recipes: Recipe[] = [
     name: "Sheet Pan Gnocchi Feta Thyme",
     mealType: "dinner",
     baseServings: 4,
+    prepMinutes: 10,
+    cookMinutes: 25,
+    tags: ["easy"],
     ingredients: [
       { amount: "1", unit: "lb", name: "Store-bought potato gnocchi", component: "Starch", notes: "Isola brand preferred", numericAmount: 1 },
       { amount: "1", unit: "bunch", name: "Broccolini", component: "Vegetable", notes: "Ends trimmed - florets big pieces - stems 0.5 inch pieces", numericAmount: 1 },
@@ -224,6 +254,9 @@ export const recipes: Recipe[] = [
     name: "Turkey Burger",
     mealType: "dinner",
     baseServings: 4,
+    prepMinutes: 15,
+    cookMinutes: 12,
+    tags: ["fast", "easy"],
     ingredients: [
       { amount: "6", unit: "oz", name: "Zucchini", component: "Vegetable", notes: "Grated - when squeezed becomes 4.25 oz", numericAmount: 6 },
       { amount: "1", unit: "lb", name: "93% lean ground turkey", component: "Protein", notes: "", numericAmount: 1 },
@@ -240,6 +273,9 @@ export const recipes: Recipe[] = [
     name: "Chicken Pesto Meatballs",
     mealType: "dinner",
     baseServings: 4,
+    prepMinutes: 15,
+    cookMinutes: 20,
+    tags: ["easy"],
     ingredients: [
       { amount: "0.75", unit: "cup", name: "Pesto", component: "Base", notes: "Homemade or store-bought - plus more for serving", numericAmount: 0.75 },
       { amount: "0.5", unit: "cup", name: "Panko bread crumbs", component: "Binder", notes: "", numericAmount: 0.5 },
@@ -256,6 +292,9 @@ export const recipes: Recipe[] = [
     name: "Grilled Fish with Salsa Verde",
     mealType: "dinner",
     baseServings: 4,
+    prepMinutes: 15,
+    cookMinutes: 10,
+    tags: ["fast"],
     ingredients: [
       { amount: "1-2", unit: "cloves", name: "Garlic", component: "Sauce", notes: "Halved - green shoots removed - to taste", numericAmount: 1.5 },
       { amount: "To taste", unit: "", name: "Salt", component: "Sauce", notes: "", numericAmount: null },
@@ -274,6 +313,9 @@ export const recipes: Recipe[] = [
     name: "Soba Noodles with Crispy Kale",
     mealType: "dinner",
     baseServings: 4,
+    prepMinutes: 15,
+    cookMinutes: 20,
+    tags: ["vegetarian"],
     ingredients: [
       { amount: "1", unit: "medium bunch", name: "Curly kale", component: "Vegetable", notes: "Ribs and stems removed - coarsely chopped - about 4 cups", numericAmount: 1 },
       { amount: "1.25", unit: "cups", name: "Unsweetened coconut flakes", component: "Garnish", notes: "", numericAmount: 1.25 },
@@ -296,6 +338,9 @@ export const recipes: Recipe[] = [
     name: "Coconut-Dill Salmon With Green Beans and Corn",
     mealType: "dinner",
     baseServings: 4,
+    prepMinutes: 15,
+    cookMinutes: 25,
+    tags: [],
     ingredients: [
       { amount: "2", unit: "lbs", name: "Salmon fillet", component: "Protein", notes: "Skin on or off", numericAmount: 2 },
       { amount: "2", unit: "tbsp", name: "Olive oil", component: "Base", notes: "", numericAmount: 2 },
@@ -318,6 +363,9 @@ export const recipes: Recipe[] = [
     name: "Easy Salmon",
     mealType: "dinner",
     baseServings: 4,
+    prepMinutes: 5,
+    cookMinutes: 15,
+    tags: ["fast", "easy"],
     ingredients: [
       { amount: "1", unit: "lb", name: "Salmon", component: "Protein", notes: "", numericAmount: 1 },
       { amount: "To taste", unit: "", name: "Farro", component: "Starch", notes: "", numericAmount: null },
@@ -329,6 +377,9 @@ export const recipes: Recipe[] = [
     name: "Stir Fry",
     mealType: "dinner",
     baseServings: 4,
+    prepMinutes: 15,
+    cookMinutes: 15,
+    tags: ["fast"],
     ingredients: [
       { amount: "1", unit: "bag", name: "Jasmine rice", component: "Starch", notes: "", numericAmount: 1 },
       { amount: "1", unit: "whole", name: "Eggplant", component: "Vegetable", notes: "", numericAmount: 1 },
@@ -351,6 +402,9 @@ export const recipes: Recipe[] = [
     name: "Chickpea Lunch Bowls",
     mealType: "lunch",
     baseServings: 2,
+    prepMinutes: 10,
+    cookMinutes: 0,
+    tags: ["fast", "easy", "vegetarian"],
     ingredients: [
       { amount: "2-3", unit: "whole", name: "Persian cucumbers", component: "Vegetable", notes: "", numericAmount: 2.5 },
       { amount: "To taste", unit: "", name: "Nutritional yeast", component: "Garnish", notes: "", numericAmount: null },

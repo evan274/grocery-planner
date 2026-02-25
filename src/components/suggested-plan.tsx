@@ -17,6 +17,9 @@ interface SuggestedPlanProps {
   onUpdateServings: (recipeId: string, servings: number) => void;
   getSwapCandidates: (recipeId: string) => Recipe[];
   onGenerateList: () => void;
+  onAcceptWasteSwap?: (suggestedRecipeId: string) => void;
+  onUndo?: () => void;
+  canUndo?: boolean;
 }
 
 export function SuggestedPlan({
@@ -27,6 +30,9 @@ export function SuggestedPlan({
   onUpdateServings,
   getSwapCandidates,
   onGenerateList,
+  onAcceptWasteSwap,
+  onUndo,
+  canUndo,
 }: SuggestedPlanProps) {
   const [swapSheetOpen, setSwapSheetOpen] = useState(false);
   const [swappingRecipeId, setSwappingRecipeId] = useState<string | null>(null);
@@ -88,6 +94,9 @@ export function SuggestedPlan({
       <IngredientWarnings
         selectedRecipes={selectedRecipes}
         selections={selections}
+        onAcceptWasteSwap={onAcceptWasteSwap}
+        onUndo={onUndo}
+        canUndo={canUndo}
       />
 
       <Button onClick={onGenerateList} size="lg" className="w-full">
