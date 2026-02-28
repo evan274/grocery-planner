@@ -49,85 +49,85 @@
 
 :root {
   --radius: 0.625rem;
-  /* Warm cream background */
-  --background: oklch(0.97 0.01 80);
-  /* Warm charcoal foreground */
-  --foreground: oklch(0.20 0.02 60);
+  /* Warm parchment background */
+  --background: oklch(0.965 0.008 85);
+  /* Deep warm foreground */
+  --foreground: oklch(0.22 0.02 165);
   /* Warm white cards */
-  --card: oklch(0.99 0.005 80);
-  --card-foreground: oklch(0.20 0.02 60);
-  --popover: oklch(0.99 0.005 80);
-  --popover-foreground: oklch(0.20 0.02 60);
-  /* Terracotta primary */
-  --primary: oklch(0.52 0.10 45);
-  --primary-foreground: oklch(0.98 0.005 80);
-  /* Warm sand secondary */
-  --secondary: oklch(0.93 0.015 75);
-  --secondary-foreground: oklch(0.30 0.03 60);
-  /* Sage muted */
-  --muted: oklch(0.93 0.015 75);
-  --muted-foreground: oklch(0.50 0.02 60);
-  /* Cream accent */
-  --accent: oklch(0.94 0.02 80);
-  --accent-foreground: oklch(0.30 0.03 60);
+  --card: oklch(0.985 0.005 85);
+  --card-foreground: oklch(0.22 0.02 165);
+  --popover: oklch(0.985 0.005 85);
+  --popover-foreground: oklch(0.22 0.02 165);
+  /* Juniper green primary — #3d6b5d */
+  --primary: oklch(0.44 0.055 165);
+  --primary-foreground: oklch(0.97 0.005 85);
+  /* Sage-cream secondary */
+  --secondary: oklch(0.925 0.012 150);
+  --secondary-foreground: oklch(0.30 0.03 165);
+  /* Muted sage */
+  --muted: oklch(0.925 0.012 150);
+  --muted-foreground: oklch(0.50 0.02 165);
+  /* Light sage accent */
+  --accent: oklch(0.935 0.018 155);
+  --accent-foreground: oklch(0.28 0.04 165);
   --destructive: oklch(0.577 0.245 27.325);
-  /* Warm border */
-  --border: oklch(0.90 0.015 75);
-  --input: oklch(0.90 0.015 75);
-  --ring: oklch(0.52 0.10 45);
-  /* Charts — earthy tones */
-  --chart-1: oklch(0.52 0.10 45);
-  --chart-2: oklch(0.55 0.08 150);
-  --chart-3: oklch(0.50 0.06 30);
-  --chart-4: oklch(0.60 0.10 90);
-  --chart-5: oklch(0.55 0.08 20);
+  /* Warm border with sage hint */
+  --border: oklch(0.895 0.01 150);
+  --input: oklch(0.895 0.01 150);
+  --ring: oklch(0.44 0.055 165);
+  /* Charts — juniper family */
+  --chart-1: oklch(0.44 0.055 165);
+  --chart-2: oklch(0.52 0.06 140);
+  --chart-3: oklch(0.48 0.05 185);
+  --chart-4: oklch(0.58 0.07 120);
+  --chart-5: oklch(0.45 0.04 200);
   /* Sidebar */
-  --sidebar: oklch(0.95 0.012 75);
-  --sidebar-foreground: oklch(0.20 0.02 60);
-  --sidebar-primary: oklch(0.52 0.10 45);
-  --sidebar-primary-foreground: oklch(0.98 0.005 80);
-  --sidebar-accent: oklch(0.92 0.02 80);
-  --sidebar-accent-foreground: oklch(0.30 0.03 60);
-  --sidebar-border: oklch(0.90 0.015 75);
-  --sidebar-ring: oklch(0.52 0.10 45);
+  --sidebar: oklch(0.95 0.01 150);
+  --sidebar-foreground: oklch(0.22 0.02 165);
+  --sidebar-primary: oklch(0.44 0.055 165);
+  --sidebar-primary-foreground: oklch(0.97 0.005 85);
+  --sidebar-accent: oklch(0.92 0.015 155);
+  --sidebar-accent-foreground: oklch(0.28 0.04 165);
+  --sidebar-border: oklch(0.895 0.01 150);
+  --sidebar-ring: oklch(0.44 0.055 165);
 }
 
 .dark {
-  /* Deep warm charcoal background */
-  --background: oklch(0.16 0.015 60);
-  --foreground: oklch(0.93 0.01 75);
-  /* Warm dark cards */
-  --card: oklch(0.20 0.015 60);
-  --card-foreground: oklch(0.93 0.01 75);
-  --popover: oklch(0.20 0.015 60);
-  --popover-foreground: oklch(0.93 0.01 75);
-  /* Lighter terracotta for dark mode */
-  --primary: oklch(0.65 0.10 45);
-  --primary-foreground: oklch(0.16 0.015 60);
-  /* Warm dark secondary */
-  --secondary: oklch(0.25 0.015 60);
-  --secondary-foreground: oklch(0.93 0.01 75);
-  --muted: oklch(0.25 0.015 60);
-  --muted-foreground: oklch(0.60 0.02 60);
-  --accent: oklch(0.25 0.015 60);
-  --accent-foreground: oklch(0.93 0.01 75);
+  /* Deep forest charcoal */
+  --background: oklch(0.155 0.015 165);
+  --foreground: oklch(0.92 0.01 150);
+  /* Cards with depth */
+  --card: oklch(0.19 0.015 165);
+  --card-foreground: oklch(0.92 0.01 150);
+  --popover: oklch(0.19 0.015 165);
+  --popover-foreground: oklch(0.92 0.01 150);
+  /* Lighter juniper for dark mode */
+  --primary: oklch(0.60 0.07 165);
+  --primary-foreground: oklch(0.155 0.015 165);
+  /* Dark secondary */
+  --secondary: oklch(0.24 0.015 165);
+  --secondary-foreground: oklch(0.92 0.01 150);
+  --muted: oklch(0.24 0.015 165);
+  --muted-foreground: oklch(0.58 0.025 165);
+  --accent: oklch(0.24 0.02 160);
+  --accent-foreground: oklch(0.92 0.01 150);
   --destructive: oklch(0.704 0.191 22.216);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.65 0.10 45);
-  --chart-1: oklch(0.65 0.10 45);
-  --chart-2: oklch(0.60 0.10 150);
-  --chart-3: oklch(0.55 0.08 30);
-  --chart-4: oklch(0.65 0.12 90);
-  --chart-5: oklch(0.60 0.10 20);
-  --sidebar: oklch(0.20 0.015 60);
-  --sidebar-foreground: oklch(0.93 0.01 75);
-  --sidebar-primary: oklch(0.65 0.10 45);
-  --sidebar-primary-foreground: oklch(0.16 0.015 60);
-  --sidebar-accent: oklch(0.25 0.015 60);
-  --sidebar-accent-foreground: oklch(0.93 0.01 75);
+  --ring: oklch(0.60 0.07 165);
+  --chart-1: oklch(0.60 0.07 165);
+  --chart-2: oklch(0.55 0.08 140);
+  --chart-3: oklch(0.52 0.06 185);
+  --chart-4: oklch(0.62 0.09 120);
+  --chart-5: oklch(0.50 0.06 200);
+  --sidebar: oklch(0.19 0.015 165);
+  --sidebar-foreground: oklch(0.92 0.01 150);
+  --sidebar-primary: oklch(0.60 0.07 165);
+  --sidebar-primary-foreground: oklch(0.155 0.015 165);
+  --sidebar-accent: oklch(0.24 0.02 160);
+  --sidebar-accent-foreground: oklch(0.92 0.01 150);
   --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.65 0.10 45);
+  --sidebar-ring: oklch(0.60 0.07 165);
 }
 
 @layer base {
@@ -140,4 +140,43 @@
   h1, h2, h3 {
     font-family: var(--font-serif), serif;
   }
+}
+
+/* Subtle grain texture overlay */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  pointer-events: none;
+  opacity: 0.025;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 256px 256px;
+}
+
+/* Staggered entry animation for lists */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-up {
+  animation: fade-up 0.4s ease-out both;
+}
+
+/* Smooth page transitions */
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+main {
+  animation: fade-in 0.3s ease-out;
 }

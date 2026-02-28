@@ -57,7 +57,7 @@ export default function RecipesPage() {
       <div className="px-4 py-6 space-y-4">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-lg font-semibold">All Recipes</h2>
+            <h2 className="text-xl font-semibold tracking-tight">Recipes</h2>
             <p className="text-sm text-muted-foreground mt-1">
               {recipes.length} recipes available
             </p>

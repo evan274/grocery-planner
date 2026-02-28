@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Lora, Inter } from "next/font/google";
+import { Lora, DM_Sans } from "next/font/google";
 import "./globals.css";
 
 const lora = Lora({
@@ -8,7 +8,7 @@ const lora = Lora({
   display: "swap",
 });
 
-const inter = Inter({
+const dmSans = DM_Sans({
   variable: "--font-sans",
   subsets: ["latin"],
   display: "swap",
@@ -21,8 +21,8 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "Grocery Planner",
-  description: "Plan meals, minimize waste, shop smarter.",
+  title: "GrocerEase — Dinner on autopilot",
+  description: "Plan meals, minimize waste, shop smarter. Dinner on autopilot.",
 };
 
 export default function RootLayout({
@@ -33,7 +33,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${lora.variable} ${inter.variable} antialiased`}
+        className={`${lora.variable} ${dmSans.variable} antialiased`}
       >
         {children}
       </body>
