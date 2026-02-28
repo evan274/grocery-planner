@@ -1,13 +1,15 @@
 "use client";
 
 import { useState, useCallback, useEffect } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
 import { StapleItem, StoreCategory } from "@/lib/types";
 
 export function useStaples() {
   const [staples, setStaples] = useState<StapleItem[]>([]);
 
   useEffect(() => {
+    if (!isSupabaseConfigured) return;
+
     const supabase = createClient();
     supabase
       .from("staples")

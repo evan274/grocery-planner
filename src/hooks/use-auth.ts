@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
 import type { User } from "@supabase/supabase-js";
 
 export function useAuth() {
@@ -9,6 +9,11 @@ export function useAuth() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!isSupabaseConfigured) {
+      setLoading(false);
+      return;
+    }
+
     const supabase = createClient();
 
     supabase.auth.getUser().then(({ data: { user } }) => {
@@ -26,6 +31,7 @@ export function useAuth() {
   }, []);
 
   async function signOut() {
+    if (!isSupabaseConfigured) return;
     const supabase = createClient();
     await supabase.auth.signOut();
   }

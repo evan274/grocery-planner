@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback, useEffect } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
 
 const DEFAULT_PANTRY = [
   "salt",
@@ -17,6 +17,11 @@ export function usePantryConfig() {
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
+    if (!isSupabaseConfigured) {
+      setLoaded(true);
+      return;
+    }
+
     const supabase = createClient();
     supabase
       .from("pantry_config")

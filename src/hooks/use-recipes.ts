@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
 import { Recipe, Ingredient } from "@/lib/types";
 import { seedRecipes } from "@/data/seed-recipes";
+import { recipes as staticRecipes } from "@/data/recipes";
 
 interface DbRecipe {
   id: string;
@@ -37,6 +38,12 @@ export function useRecipes() {
   const [loading, setLoading] = useState(true);
 
   const fetchRecipes = useCallback(async () => {
+    if (!isSupabaseConfigured) {
+      setRecipes(staticRecipes);
+      setLoading(false);
+      return;
+    }
+
     const supabase = createClient();
     const { data, error } = await supabase
       .from("recipes")
