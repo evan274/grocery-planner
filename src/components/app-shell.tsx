@@ -1,6 +1,8 @@
 "use client";
 
 import { ReactNode } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
   Sheet,
   SheetContent,
@@ -8,24 +10,31 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { Menu, UtensilsCrossed, BookOpen, ShoppingBasket } from "lucide-react";
+import { Menu, UtensilsCrossed, BookOpen, ShoppingBasket, LogOut } from "lucide-react";
 import { useState } from "react";
-import { Section } from "@/hooks/use-navigation";
+import { useAuth } from "@/hooks/use-auth";
 
-interface AppShellProps {
-  children: ReactNode;
-  currentSection: Section;
-  onNavigate: (section: Section) => void;
+interface NavItem {
+  href: string;
+  label: string;
+  icon: typeof Menu;
 }
 
-const navItems: { section: Section; label: string; icon: typeof Menu }[] = [
-  { section: "planner", label: "Grocery Planner", icon: UtensilsCrossed },
-  { section: "recipes", label: "Recipes", icon: BookOpen },
-  { section: "staples", label: "Staples", icon: ShoppingBasket },
+const navItems: NavItem[] = [
+  { href: "/", label: "Grocery Planner", icon: UtensilsCrossed },
+  { href: "/recipes", label: "Recipes", icon: BookOpen },
+  { href: "/staples", label: "Staples", icon: ShoppingBasket },
 ];
 
-export function AppShell({ children, currentSection, onNavigate }: AppShellProps) {
+export function AppShell({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false);
+  const pathname = usePathname();
+  const { user, signOut } = useAuth();
+
+  function isActive(href: string) {
+    if (href === "/") return pathname === "/";
+    return pathname.startsWith(href);
+  }
 
   return (
     <div className="min-h-screen">
@@ -39,34 +48,53 @@ export function AppShell({ children, currentSection, onNavigate }: AppShellProps
           >
             <Menu className="h-5 w-5" />
           </Button>
-          <h1 className="text-lg font-bold text-primary">Grocery Planner</h1>
+          <Link href="/" className="text-xl font-bold text-primary font-serif tracking-tight">
+            Grocery Planner
+          </Link>
         </div>
       </header>
 
       <Sheet open={open} onOpenChange={setOpen}>
-        <SheetContent side="left" className="w-72 p-0">
+        <SheetContent side="left" className="w-72 p-0 flex flex-col">
           <SheetHeader className="p-6 pb-4">
-            <SheetTitle className="text-primary">Menu</SheetTitle>
+            <SheetTitle className="text-primary font-serif">Menu</SheetTitle>
           </SheetHeader>
-          <nav className="px-3 space-y-1">
-            {navItems.map(({ section, label, icon: Icon }) => (
-              <button
-                key={section}
-                onClick={() => {
-                  onNavigate(section);
-                  setOpen(false);
-                }}
+          <nav className="px-3 space-y-1 flex-1">
+            {navItems.map(({ href, label, icon: Icon }) => (
+              <Link
+                key={href}
+                href={href}
+                onClick={() => setOpen(false)}
                 className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                  currentSection === section
+                  isActive(href)
                     ? "bg-primary text-primary-foreground"
                     : "text-foreground hover:bg-accent"
                 }`}
               >
                 <Icon className="h-4 w-4" />
                 {label}
-              </button>
+              </Link>
             ))}
           </nav>
+          {user && (
+            <div className="border-t p-4 space-y-3">
+              <p className="text-xs text-muted-foreground truncate">
+                {user.email}
+              </p>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="w-full justify-start text-muted-foreground"
+                onClick={async () => {
+                  await signOut();
+                  setOpen(false);
+                }}
+              >
+                <LogOut className="h-4 w-4 mr-2" />
+                Sign out
+              </Button>
+            </div>
+          )}
         </SheetContent>
       </Sheet>
 

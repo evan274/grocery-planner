@@ -1,18 +1,16 @@
 "use client";
 
 import { useMealPlan } from "@/hooks/use-meal-plan";
-import { useNavigation } from "@/hooks/use-navigation";
+import { useRecipes } from "@/hooks/use-recipes";
 import { useStaples } from "@/hooks/use-staples";
 import { AppShell } from "@/components/app-shell";
 import { MealCountPicker } from "@/components/meal-count-picker";
 import { SuggestedPlan } from "@/components/suggested-plan";
 import { GroceryList } from "@/components/grocery-list";
-import { RecipesPage } from "@/components/recipes-page";
-import { StaplesPage } from "@/components/staples-page";
 
-export default function Home() {
-  const { section, navigateTo } = useNavigation();
-  const { staples, addStaple, removeStaple, editStaple } = useStaples();
+export default function PlannerPage() {
+  const { recipes, loading: recipesLoading } = useRecipes();
+  const { staples } = useStaples();
 
   const {
     view,
@@ -39,22 +37,15 @@ export default function Home() {
     toggleChecked,
     goToList,
     goToPlan,
-  } = useMealPlan();
+  } = useMealPlan(recipes);
 
   return (
-    <AppShell currentSection={section} onNavigate={navigateTo}>
-      {section === "recipes" && <RecipesPage />}
-
-      {section === "staples" && (
-        <StaplesPage
-          staples={staples}
-          onAdd={addStaple}
-          onRemove={removeStaple}
-          onEdit={editStaple}
-        />
-      )}
-
-      {section === "planner" && (
+    <AppShell>
+      {recipesLoading ? (
+        <div className="px-4 py-12 text-center text-muted-foreground">
+          Loading recipes...
+        </div>
+      ) : (
         <>
           {view === "list" ? (
             <GroceryList
@@ -89,6 +80,7 @@ export default function Home() {
                 <SuggestedPlan
                   selectedRecipes={selectedRecipes}
                   selections={selections}
+                  allRecipes={recipes}
                   onShuffle={shuffle}
                   onSwap={swapRecipe}
                   onUpdateServings={updateServings}

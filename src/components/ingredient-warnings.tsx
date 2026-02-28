@@ -1,7 +1,6 @@
 "use client";
 
 import { Recipe, MealSelection, WasteWarning } from "@/lib/types";
-import { recipes as allRecipes } from "@/data/recipes";
 import { useMemo } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -41,6 +40,7 @@ function normalizeKey(name: string): string {
 interface IngredientWarningsProps {
   selectedRecipes: Recipe[];
   selections: MealSelection[];
+  allRecipes?: Recipe[];
   onAcceptWasteSwap?: (suggestedRecipeId: string) => void;
   onUndo?: () => void;
   canUndo?: boolean;
@@ -49,6 +49,7 @@ interface IngredientWarningsProps {
 export function IngredientWarnings({
   selectedRecipes,
   selections,
+  allRecipes = [],
   onAcceptWasteSwap,
   onUndo,
   canUndo = false,

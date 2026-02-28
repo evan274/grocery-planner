@@ -1,8 +1,7 @@
 "use client";
 
 import { useState, useCallback, useEffect } from "react";
-
-const STORAGE_KEY = "grocery-pantry-config";
+import { createClient } from "@/lib/supabase/client";
 
 const DEFAULT_PANTRY = [
   "salt",
@@ -13,30 +12,59 @@ const DEFAULT_PANTRY = [
   "water",
 ];
 
-function loadPantry(): Set<string> {
-  if (typeof window === "undefined") return new Set(DEFAULT_PANTRY);
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) return new Set(JSON.parse(stored));
-  } catch {}
-  return new Set(DEFAULT_PANTRY);
-}
-
 export function usePantryConfig() {
-  const [pantryItems, setPantryItems] = useState<Set<string>>(() => loadPantry());
+  const [pantryItems, setPantryItems] = useState<Set<string>>(new Set(DEFAULT_PANTRY));
+  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify([...pantryItems]));
-  }, [pantryItems]);
-
-  const addItem = useCallback((name: string) => {
-    setPantryItems((prev) => new Set([...prev, name.toLowerCase().trim()]));
+    const supabase = createClient();
+    supabase
+      .from("pantry_config")
+      .select("item_name")
+      .then(({ data }) => {
+        if (data && data.length > 0) {
+          setPantryItems(new Set(data.map((row) => row.item_name)));
+        }
+        // If no rows, user hasn't customized yet — seed defaults
+        if (data && data.length === 0) {
+          seedDefaults(supabase);
+        }
+        setLoaded(true);
+      });
   }, []);
 
-  const removeItem = useCallback((name: string) => {
+  const addItem = useCallback(async (name: string) => {
+    const normalized = name.toLowerCase().trim();
+    const supabase = createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return;
+
+    await supabase
+      .from("pantry_config")
+      .upsert({ user_id: user.id, item_name: normalized }, { onConflict: "user_id,item_name" });
+
+    setPantryItems((prev) => new Set([...prev, normalized]));
+  }, []);
+
+  const removeItem = useCallback(async (name: string) => {
+    const normalized = name.toLowerCase().trim();
+    const supabase = createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return;
+
+    await supabase
+      .from("pantry_config")
+      .delete()
+      .eq("user_id", user.id)
+      .eq("item_name", normalized);
+
     setPantryItems((prev) => {
       const next = new Set(prev);
-      next.delete(name.toLowerCase().trim());
+      next.delete(normalized);
       return next;
     });
   }, []);
@@ -46,5 +74,19 @@ export function usePantryConfig() {
     [pantryItems]
   );
 
-  return { pantryItems, addItem, removeItem, isOnHand };
+  return { pantryItems, addItem, removeItem, isOnHand, loaded };
+}
+
+async function seedDefaults(supabase: ReturnType<typeof createClient>) {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return;
+
+  const rows = DEFAULT_PANTRY.map((item) => ({
+    user_id: user.id,
+    item_name: item,
+  }));
+
+  await supabase.from("pantry_config").insert(rows);
 }

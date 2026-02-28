@@ -1,11 +1,9 @@
 "use client";
 
 import { useState, useCallback, useMemo, useRef } from "react";
-import { recipes } from "@/data/recipes";
-import { MealSelection, ViewState, ConsolidatedItem } from "@/lib/types";
+import { MealSelection, ViewState, Recipe } from "@/lib/types";
 import { suggestMeals, rankSwapCandidates } from "@/lib/suggest";
 import { consolidateWithPantry, ConsolidationResult } from "@/lib/consolidate";
-import { Recipe } from "@/lib/types";
 import { usePantryConfig } from "./use-pantry-config";
 
 interface PlanSnapshot {
@@ -13,7 +11,7 @@ interface PlanSnapshot {
   selections: MealSelection[];
 }
 
-export function useMealPlan() {
+export function useMealPlan(allRecipes: Recipe[]) {
   const [view, setView] = useState<ViewState>("plan");
   const [mealCount, setMealCount] = useState(5);
   const [peopleCount, setPeopleCount] = useState(4);
@@ -29,7 +27,7 @@ export function useMealPlan() {
   const { pantryItems, addItem: addPantryItem, removeItem: removePantryItem, isOnHand } = usePantryConfig();
 
   const generatePlan = useCallback(() => {
-    const suggested = suggestMeals(recipes, mealCount);
+    const suggested = suggestMeals(allRecipes, mealCount);
     setSelectedRecipes(suggested);
     setSelections(
       suggested.map((r) => ({
@@ -40,10 +38,10 @@ export function useMealPlan() {
     setHasGenerated(true);
     undoSnapshot.current = null;
     setCanUndo(false);
-  }, [mealCount, peopleCount]);
+  }, [allRecipes, mealCount, peopleCount]);
 
   const shuffle = useCallback(() => {
-    const suggested = suggestMeals(recipes, mealCount);
+    const suggested = suggestMeals(allRecipes, mealCount);
     setSelectedRecipes(suggested);
     setSelections(
       suggested.map((r) => ({
@@ -53,7 +51,7 @@ export function useMealPlan() {
     );
     undoSnapshot.current = null;
     setCanUndo(false);
-  }, [mealCount, peopleCount]);
+  }, [allRecipes, mealCount, peopleCount]);
 
   const swapRecipe = useCallback(
     (oldRecipeId: string, newRecipe: Recipe) => {
@@ -80,14 +78,12 @@ export function useMealPlan() {
       };
       setCanUndo(true);
 
-      const suggestedRecipe = recipes.find((r) => r.id === suggestedRecipeId);
+      const suggestedRecipe = allRecipes.find((r) => r.id === suggestedRecipeId);
       if (!suggestedRecipe) return;
 
-      // Find the recipe with lowest overlap to the rest (the "least relevant")
+      // Find the recipe with lowest overlap to the rest
       const overlapScores = selectedRecipes.map((recipe) => {
         const others = selectedRecipes.filter((r) => r.id !== recipe.id);
-        // Use rankSwapCandidates logic in reverse: score each current recipe
-        // by how much overlap it has with the others
         let totalOverlap = 0;
         for (const other of others) {
           const sharedKeys = new Set<string>();
@@ -117,7 +113,7 @@ export function useMealPlan() {
         )
       );
     },
-    [selectedRecipes, selections, peopleCount]
+    [allRecipes, selectedRecipes, selections, peopleCount]
   );
 
   const undoWasteSwap = useCallback(() => {
@@ -130,9 +126,9 @@ export function useMealPlan() {
 
   const getSwapCandidates = useCallback(
     (recipeId: string) => {
-      return rankSwapCandidates(recipes, selectedRecipes, recipeId);
+      return rankSwapCandidates(allRecipes, selectedRecipes, recipeId);
     },
-    [selectedRecipes]
+    [allRecipes, selectedRecipes]
   );
 
   const updateServings = useCallback((recipeId: string, servings: number) => {
@@ -152,10 +148,10 @@ export function useMealPlan() {
   const groceryData: ConsolidationResult = useMemo(() => {
     if (selections.length === 0) return { items: [], pantryItems: [] };
     const selectedRecipeObjects = selections
-      .map((s) => recipes.find((r) => r.id === s.recipeId))
+      .map((s) => allRecipes.find((r) => r.id === s.recipeId))
       .filter((r): r is Recipe => r !== undefined);
     return consolidateWithPantry(selectedRecipeObjects, selections, pantryItems);
-  }, [selections, pantryItems]);
+  }, [allRecipes, selections, pantryItems]);
 
   const groceryList = groceryData.items;
   const pantryReminders = groceryData.pantryItems;

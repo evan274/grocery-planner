@@ -12,6 +12,7 @@ import { Shuffle } from "lucide-react";
 interface SuggestedPlanProps {
   selectedRecipes: Recipe[];
   selections: MealSelection[];
+  allRecipes?: Recipe[];
   onShuffle: () => void;
   onSwap: (oldId: string, newRecipe: Recipe) => void;
   onUpdateServings: (recipeId: string, servings: number) => void;
@@ -25,6 +26,7 @@ interface SuggestedPlanProps {
 export function SuggestedPlan({
   selectedRecipes,
   selections,
+  allRecipes = [],
   onShuffle,
   onSwap,
   onUpdateServings,
@@ -94,6 +96,7 @@ export function SuggestedPlan({
       <IngredientWarnings
         selectedRecipes={selectedRecipes}
         selections={selections}
+        allRecipes={allRecipes}
         onAcceptWasteSwap={onAcceptWasteSwap}
         onUndo={onUndo}
         canUndo={canUndo}
