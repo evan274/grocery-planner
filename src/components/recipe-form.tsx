@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Ingredient, Recipe } from "@/lib/types";
-import { Plus, Trash2, Link as LinkIcon, Loader2 } from "lucide-react";
+import { Plus, Trash2, Link as LinkIcon, Loader2, Camera } from "lucide-react";
 
 const MEAL_TYPES = ["dinner", "lunch"] as const;
 const TAG_OPTIONS = ["easy", "fast", "vegetarian", "italian", "asian", "mexican", "mediterranean", "american", "indian"];
@@ -37,10 +37,12 @@ export function RecipeForm({ initialData, onSubmit, submitLabel }: RecipeFormPro
     initialData?.ingredients?.length ? initialData.ingredients : [emptyIngredient()]
   );
 
+  const [imported, setImported] = useState(!!initialData);
   const [importUrl, setImportUrl] = useState("");
   const [importing, setImporting] = useState(false);
   const [importError, setImportError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   function toggleTag(tag: string) {
     setTags((prev) =>
@@ -62,7 +64,31 @@ export function RecipeForm({ initialData, onSubmit, submitLabel }: RecipeFormPro
     setIngredients((prev) => [...prev, emptyIngredient()]);
   }
 
-  async function handleImport() {
+  function applyImportData(data: {
+    name?: string;
+    ingredients?: Ingredient[];
+    prepMinutes?: number | null;
+    cookMinutes?: number | null;
+    baseServings?: number;
+    tags?: string[];
+  }) {
+    if (data.name) setName(data.name);
+    if (data.prepMinutes != null) setPrepMinutes(data.prepMinutes);
+    if (data.cookMinutes != null) setCookMinutes(data.cookMinutes);
+    if (data.baseServings) setBaseServings(data.baseServings);
+    if (data.tags?.length) setTags(data.tags);
+    if (data.ingredients?.length) {
+      setIngredients(
+        data.ingredients.map((ing: Ingredient) => ({
+          ...ing,
+          numericAmount: ing.numericAmount ?? (parseFloat(ing.amount) || null),
+        }))
+      );
+    }
+    setImported(true);
+  }
+
+  async function handleUrlImport() {
     if (!importUrl.trim()) return;
     setImporting(true);
     setImportError("");
@@ -81,24 +107,47 @@ export function RecipeForm({ initialData, onSubmit, submitLabel }: RecipeFormPro
         return;
       }
 
-      setName(data.name || name);
-      if (data.prepMinutes != null) setPrepMinutes(data.prepMinutes);
-      if (data.cookMinutes != null) setCookMinutes(data.cookMinutes);
-      if (data.baseServings) setBaseServings(data.baseServings);
-      if (data.tags?.length) setTags(data.tags);
-      if (data.ingredients?.length) {
-        setIngredients(
-          data.ingredients.map((ing: Ingredient) => ({
-            ...ing,
-            numericAmount: ing.numericAmount ?? (parseFloat(ing.amount) || null),
-          }))
-        );
-      }
+      applyImportData(data);
     } catch {
       setImportError("Failed to connect. Check the URL and try again.");
     } finally {
       setImporting(false);
     }
+  }
+
+  async function handlePhotoImport(file: File) {
+    setImporting(true);
+    setImportError("");
+
+    try {
+      const formData = new FormData();
+      formData.append("image", file);
+
+      const res = await fetch("/api/recipes/ocr", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setImportError(data.error || "OCR failed");
+        return;
+      }
+
+      applyImportData(data);
+    } catch {
+      setImportError("Failed to process image. Try again.");
+    } finally {
+      setImporting(false);
+    }
+  }
+
+  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (file) handlePhotoImport(file);
+    // Reset so the same file can be re-selected
+    e.target.value = "";
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -128,37 +177,87 @@ export function RecipeForm({ initialData, onSubmit, submitLabel }: RecipeFormPro
     setSubmitting(false);
   }
 
-  return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      {/* URL Import */}
-      <Card>
-        <CardContent className="p-4 space-y-3">
-          <label className="block text-sm font-medium">Import from URL</label>
-          <div className="flex gap-2">
+  // Phase 1: Import UI (shown when not yet imported and not in edit mode)
+  if (!imported) {
+    return (
+      <div className="space-y-4">
+        <Card>
+          <CardContent className="p-4 space-y-3">
+            <label className="block text-sm font-medium">Import from URL</label>
+            <div className="flex gap-2">
+              <input
+                type="url"
+                value={importUrl}
+                onChange={(e) => { setImportUrl(e.target.value); setImportError(""); }}
+                placeholder="Paste a recipe URL..."
+                className="flex-1 h-10 rounded-lg border bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); handleUrlImport(); } }}
+              />
+              <Button type="button" variant="outline" onClick={handleUrlImport} disabled={importing}>
+                {importing ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <LinkIcon className="h-4 w-4" />
+                )}
+              </Button>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Works with NYT Cooking, AllRecipes, Bon Appetit, Serious Eats, and most recipe sites.
+            </p>
+          </CardContent>
+        </Card>
+
+        <div className="flex items-center gap-3">
+          <div className="h-px flex-1 bg-border" />
+          <span className="text-xs text-muted-foreground uppercase tracking-wide">or</span>
+          <div className="h-px flex-1 bg-border" />
+        </div>
+
+        <Card>
+          <CardContent className="p-4 space-y-3">
+            <label className="block text-sm font-medium">Upload a photo</label>
             <input
-              type="url"
-              value={importUrl}
-              onChange={(e) => setImportUrl(e.target.value)}
-              placeholder="Paste a recipe URL..."
-              className="flex-1 h-10 rounded-lg border bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleFileChange}
+              className="hidden"
             />
-            <Button type="button" variant="outline" onClick={handleImport} disabled={importing}>
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full h-20 border-dashed"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={importing}
+            >
               {importing ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
+                <div className="flex items-center gap-2">
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                  <span className="text-sm">Reading recipe...</span>
+                </div>
               ) : (
-                <LinkIcon className="h-4 w-4" />
+                <div className="flex items-center gap-2">
+                  <Camera className="h-5 w-5" />
+                  <span className="text-sm">Take a photo or choose an image</span>
+                </div>
               )}
             </Button>
-          </div>
-          {importError && (
-            <p className="text-sm text-destructive">{importError}</p>
-          )}
-          <p className="text-xs text-muted-foreground">
-            Works with NYT Cooking, AllRecipes, Bon Appetit, Serious Eats, and most recipe sites.
-          </p>
-        </CardContent>
-      </Card>
+            <p className="text-xs text-muted-foreground">
+              Snap a photo of a recipe&apos;s ingredient list. OCR will extract what it can — you can edit after.
+            </p>
+          </CardContent>
+        </Card>
 
+        {importError && (
+          <p className="text-sm text-destructive text-center">{importError}</p>
+        )}
+      </div>
+    );
+  }
+
+  // Phase 2: Full form (shown after import or in edit mode)
+  return (
+    <form onSubmit={handleSubmit} className="space-y-6">
       {/* Basic Info */}
       <div className="space-y-4">
         <div>
@@ -303,7 +402,7 @@ export function RecipeForm({ initialData, onSubmit, submitLabel }: RecipeFormPro
                 value={ing.notes}
                 onChange={(e) => updateIngredient(idx, "notes", e.target.value)}
                 placeholder="Notes"
-                className="w-24 h-9 rounded-lg border bg-background px-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring hidden sm:block"
+                className="w-24 h-9 rounded-lg border bg-background px-2 text-sm hidden sm:block"
               />
               <Button
                 type="button"
